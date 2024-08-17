@@ -15,7 +15,6 @@ const GET = async (request, context) => {
     return Response.json({ url: firstUrl });
   } else if (targetUrl.includes('goodreads.com')) {
     const imageUrl = $('div.BookCover__image img').attr('src');
-    console.log('imageUrlxx', imageUrl);
     return Response.json({ url: imageUrl });
   }
 

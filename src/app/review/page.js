@@ -1,11 +1,12 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 import Navbar from "@/components/Layout/Navbar";
 import { BiSolidCloudDownload } from "react-icons/bi";
 import Modal from '@/components/Modal';
 import Button from '@/components/Button';
+import html2canvas from 'html2canvas';
 
 const bookInit = [
   { id: 1, title: 'Quyền sách yêu thích nhất' },
@@ -39,6 +40,7 @@ export default function Page() {
   const [openBook, setOpenBook] = useState();
   const [urlBook, setUrlBook] = useState();
   const [uploadType, setUploadType] = useState('link');
+  const elementRef = useRef(null);
 
 
   const onExport = () => {
@@ -52,6 +54,12 @@ export default function Page() {
       .catch(function (error) {
         console.error('oops, something went wrong!', error);
       });
+    // html2canvas(elementRef.current, { useCORS: true, allowTaint: false }).then((canvas) => {
+    //   const link = document.createElement('a');
+    //   link.href = canvas.toDataURL('image/png');
+    //   link.download = 'screenshot.png';
+    //   link.click();
+    // });
   };
 
   const onChangeUrlPath = (e) => {
@@ -62,15 +70,22 @@ export default function Page() {
 
   const onAddBook = async () => {
     if (!urlBook) return;
+
     try {
-      const rs = await axios.get("api/review", {
-        params: {
-          url: urlBook
-        }
-      });
+      let cv = '';
+      if (urlBook.includes('goodreads') || urlBook.includes('tiki')) {
+        const rs = await axios.get("api/review", {
+          params: {
+            url: urlBook
+          }
+        });
+        cv = rs.data.url;
+      } else {
+        cv = urlBook;
+      }
       const addCoverToBook = books?.map(book => {
         if (book.id === openBook.id) {
-          return { ...book, cover: rs.data.url };
+          return { ...book, cover: cv };
         }
         return book;
       });
@@ -101,7 +116,7 @@ export default function Page() {
               <BiSolidCloudDownload className='ml-2 text-2xl text-white' />
             </div>
           </div>
-          <div id='capture' className='bg-[#FDF2E4] md:p-2'>
+          <div id='capture' ref={elementRef} className='bg-[#FDF2E4] md:p-2'>
             <div className='text-center font-serif font-bold text-3xl md:text-8xl sm:mt-3 text-[#7B7754]'>About you: Books</div>
             <div>
 
@@ -135,7 +150,7 @@ export default function Page() {
             <div>
               <div onClick={onSelectUploadType('link')} className='cursor-pointer'>
                 <input type="radio" value="link" name="uploadType" onChange={() => onSelectUploadType('link')} checked={uploadType === 'link'} />
-                <span className='ml-1'>Chọn ảnh từ link ( Chỉ từ goodreads.com hoặc tiki.com )</span>
+                <span className='ml-1'>Chọn ảnh từ link ( Chỉ từ goodreads.com hoặc tiki.com hoặc link ảnh )</span>
               </div>
               <div onClick={onSelectUploadType('device')} className='cursor-pointer'>
                 <input type="radio" value="device" name="uploadType" onChange={() => onSelectUploadType('device')} checked={uploadType === 'device'} />
