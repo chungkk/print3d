@@ -13,8 +13,8 @@ export default function Navbar() {
   const onToggleMenu = () => setIsOpen(!isOpen);
   return (
     <div className='bg-black h-20 pl-4 md:px-12 rounded-2xl text-white flex justify-between items-center'>
-      <Link href='/' className='text-white text-xl font-bold'>Cee's BookShelves</Link>
-      <div className='hidden sm:hidden md:flex lg:flex xl:flex 2xl:flex  flex-row text-white'>
+      <Link href='/' className='text-white text-xl font-bold'>Cee&apos;s BookShelves</Link>
+      <div className='hidden sm:hidden md:flex lg:flex xl:flex 2xl:flex flex-row text-white'>
         <Link href='/' className='text-white mr-7'>Books</Link>
         <Link href='/review' className='text-white mr-7'>Review</Link>
         <Link href='/' className='text-white mr-7'>Events</Link>

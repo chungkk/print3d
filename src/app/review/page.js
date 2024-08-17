@@ -34,7 +34,7 @@ const bookInit = [
   { id: 24, title: 'Không phải thể loại bạn hay đọc' },
 ];
 
-export default function page() {
+export default function Page() {
   const [books, setBooks] = useState(bookInit);
   const [openBook, setOpenBook] = useState();
   const [urlBook, setUrlBook] = useState();
