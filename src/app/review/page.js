@@ -9,7 +9,7 @@ import Button from '@/components/Button';
 import html2canvas from 'html2canvas';
 
 const bookInit = [
-  { id: 1, title: 'Quyền sách yêu thích nhất' },
+  { id: 1, title: 'Quyền sách yêu thích nhất', cover: 'https://salt.tikicdn.com/cache/750x750/media/catalog/product/s/o/son-ca-van-hot.u2469.d20161101.t161003.377293.jpg' },
   { id: 2, title: 'Cốt truyện hay nhất' },
   { id: 3, title: 'Bìa đẹp nhất' },
   { id: 4, title: 'Quyền sách bạn sẽ đọc' },
@@ -44,11 +44,8 @@ export default function Page() {
 
 
   const onExport = () => {
-    // const capture = document.getElementById('capture');
-    if (elementRef.current === null) {
-      return;
-    }
-    toPng(elementRef, { cacheBust: true }).then(function (dataUrl) {
+    const capture = document.getElementById('capture');
+    toPng(capture, { cacheBust: true }).then(function (dataUrl) {
       var link = document.createElement('a');
       link.download = 'my-image-name.jpeg';
       link.href = dataUrl;
