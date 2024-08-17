@@ -44,8 +44,11 @@ export default function Page() {
 
 
   const onExport = () => {
-    const capture = document.getElementById('capture');
-    toPng(capture, { cacheBust: true }).then(function (dataUrl) {
+    // const capture = document.getElementById('capture');
+    if (elementRef.current === null) {
+      return;
+    }
+    toPng(elementRef, { cacheBust: true }).then(function (dataUrl) {
       var link = document.createElement('a');
       link.download = 'my-image-name.jpeg';
       link.href = dataUrl;
