@@ -10,7 +10,7 @@ export default function About({ searchParams }) {
         <div className="flex justify-center items-center flex-col flex-1">
           <div className="font-semibold text-4xl md:text-8xl text-center">nice to meet you</div>
           <div className="mt-8 px-6">
-            <p>Tôi là Cee!. </p>
+            <p>Tớ là Cee!. </p>
             <p className="md:max-w-[600px]">Nếu bạn có câu hỏi gì thì đừng ngần ngại ném tôi 1 <a className="text-blue-500" href="mailto:hello@sachoi.com">cái meo ở đây!</a></p>
           </div>
         </div>
