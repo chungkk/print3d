@@ -28,7 +28,7 @@ export default async function Home({ searchParams }) {
                 <h3 className='text-md font-bold overflow-hidden line-clamp-2 mt-1'>{book.title}</h3>
                 <p className='text-sm text-gray-500'>{book.author}</p>
                 <p className='text-sm text-gray-500'>{book.category}</p>
-                <p className='text-sm text-gray-500'>${book.price}</p>
+                {/* <p className='text-sm text-gray-500'>${book.price}</p> */}
               </div>
             </div>
           );
