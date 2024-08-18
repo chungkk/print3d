@@ -175,7 +175,7 @@ export default function Page() {
 
 
   return (
-    <section className="px-4 md:px-6  py-6">
+    <section className="px-4 md:px-6 py-6">
       <main className="flex flex-col justify-between">
         <Navbar />
         <div className='md:px-10'>

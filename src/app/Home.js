@@ -12,7 +12,7 @@ export default async function Home({ searchParams }) {
   const totalBooks = await fetchBooks({ category, query });
   return (
     <div>
-      <div className='px-20'>
+      <div className='md:px-20'>
         {/* Search */}
         <Search />
         {/* Categories */}
