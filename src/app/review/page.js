@@ -70,7 +70,16 @@ export default function Page() {
   const [urlBook, setUrlBook] = useState();
   const [uploadType, setUploadType] = useState('link');
   const [tempCover, setTempCover] = useState();
-  const [author, setAuthor] = useState('@Cee');
+  const [author, setAuthor] = useState('@SachOi');
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const bookLocal = localStorage.getItem("sachOiBooks") || [];
+      const authorLocal = localStorage.getItem("sachOiAuthor");
+      bookLocal?.length && setBooks(JSON.parse(bookLocal));
+      authorLocal && setAuthor(authorLocal);
+    }
+  }, []);
 
   const onDrop = useCallback((acceptedFiles) => {
     const file = acceptedFiles[0]; // Chỉ lấy file đầu tiên
@@ -108,7 +117,7 @@ export default function Page() {
     const capture = document.getElementById('capture');
     toPng(capture, { cacheBust: true }).then(function (dataUrl) {
       var link = document.createElement('a');
-      link.download = 'my-image-name.jpeg';
+      link.download = `sachoi.com-${author?.replace(/[^a-zA-Z0-9]/g, '')}.png`;
       link.href = dataUrl;
       link.click();
     })
@@ -146,9 +155,9 @@ export default function Page() {
           return book;
         });
         setBooks(addCoverToBook);
+        localStorage.setItem('sachOiBooks', JSON.stringify(addCoverToBook));
         setOpenBook(null);
         setUrlBook('');
-
       } catch (error) {
         console.log("=====>>>>> onAddBook error: " + error);
       }
@@ -161,6 +170,8 @@ export default function Page() {
         return book;
       });
       setBooks(addCoverToBook);
+      localStorage.setItem('sachOiBooks', JSON.stringify(addCoverToBook));
+      setValue(addCoverToBook);
       setOpenBook(null);
       setTempCover('');
     }
@@ -173,20 +184,25 @@ export default function Page() {
 
   const onChangeTitle = (ev) => setOpenBook(prev => ({ ...prev, title: ev.target.value }));
 
+  const onChangeAuthor = (ev) => {
+    setAuthor(ev.target.value);
+    localStorage.setItem('sachOiAuthor', ev.target.value);
+  };
+
 
   return (
     <section className="px-4 md:px-6 py-6">
       <main className="flex flex-col justify-between">
         <Navbar />
         <div className='md:px-10'>
-          <div className='my-4 md:px-4 flex flex-row items-center justify-between'>
+          <div className='my-4 md:px-4 flex flex-row items-end justify-between'>
             <div className='text-[#7B7754] text-sm w-1/2'>
               <div>Chỉnh sửa tác giả?</div>
               <div className='flex flex-col sm:flex-row'>
-                <input value={author} onChange={(ev) => setAuthor(ev.target.value)}
+                <input value={author} onChange={onChangeAuthor}
                   className='rounded-md border border-gray-300 p-2 sm:mr-2'
                   placeholder='Nhập tên bạn' />
-                <Button name='Update' className='bg-green-500 text-white mt-2 sm:mt-0' />
+                {/* <Button name='Update' className='bg-green-500 text-white mt-2 sm:mt-0' /> */}
               </div>
             </div>
             <div onClick={onExport} className='border flex flex-row items-center rounded-md p-3 bg-red-500  cursor-pointer'>
@@ -260,7 +276,7 @@ export default function Page() {
             </div>
 
             <div>
-              <input value={openBook?.title} onChange={onChangeTitle} className='border border-grey w-full p-2 mt-2' placeholder='Nhập content' />
+              <input value={openBook?.title || ''} onChange={onChangeTitle} className='border border-grey w-full p-2 mt-2' placeholder='Nhập content' />
             </div>
 
             <div className='flex justify-end mt-2'>
