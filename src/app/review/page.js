@@ -1,12 +1,12 @@
 "use client";
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import axios from 'axios';
 import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 import Navbar from "@/components/Layout/Navbar";
 import { BiSolidCloudDownload } from "react-icons/bi";
 import Modal from '@/components/Modal';
 import Button from '@/components/Button';
-import html2canvas from 'html2canvas';
+import { useDropzone } from 'react-dropzone';
 
 const bookInit = [
   { id: 1, title: 'Quyền sách yêu thích nhất', },
@@ -35,12 +35,73 @@ const bookInit = [
   { id: 24, title: 'Không phải thể loại bạn hay đọc' },
 ];
 
+const baseStyle = {
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  padding: '20px',
+  borderWidth: 2,
+  borderRadius: 4,
+  borderColor: '#eeeeee',
+  borderStyle: 'dashed',
+  backgroundColor: '#fafafa',
+  color: '#bdbdbd',
+  outline: 'none',
+  transition: 'border .24s ease-in-out',
+};
+
+const focusedStyle = {
+  borderColor: '#2196f3',
+};
+
+const acceptStyle = {
+  borderColor: '#00e676',
+};
+
+const rejectStyle = {
+  borderColor: '#ff1744',
+};
+
+
 export default function Page() {
   const [books, setBooks] = useState(bookInit);
   const [openBook, setOpenBook] = useState();
   const [urlBook, setUrlBook] = useState();
   const [uploadType, setUploadType] = useState('link');
-  const elementRef = useRef(null);
+  const [tempCover, setTempCover] = useState();
+  const [author, setAuthor] = useState('@Cee');
+
+  const onDrop = useCallback((acceptedFiles) => {
+    const file = acceptedFiles[0]; // Chỉ lấy file đầu tiên
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const base64 = reader.result;
+      setTempCover(base64); // Cập nhật state với base64 của file
+    };
+
+    reader.readAsDataURL(file);
+  }, []);
+
+  const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject, acceptedFiles, fileRejections } = useDropzone({
+    onDrop,
+    maxFiles: 1,
+    accept: {
+      'image/*': []
+    },
+    // validator: validateFile,
+  });
+
+  const style = useMemo(
+    () => ({
+      ...baseStyle,
+      ...(isFocused ? focusedStyle : {}),
+      ...(isDragAccept ? acceptStyle : {}),
+      ...(isDragReject ? rejectStyle : {}),
+    }),
+    [isFocused, isDragAccept, isDragReject]
+  );
 
 
   const onExport = () => {
@@ -54,12 +115,6 @@ export default function Page() {
       .catch(function (error) {
         console.error('oops, something went wrong!', error);
       });
-    // html2canvas(elementRef.current, { useCORS: true, allowTaint: false }).then((canvas) => {
-    //   const link = document.createElement('a');
-    //   link.href = canvas.toDataURL('image/png');
-    //   link.download = 'screenshot.png';
-    //   link.click();
-    // });
   };
 
   const onChangeUrlPath = (e) => {
@@ -69,32 +124,45 @@ export default function Page() {
   const onSelectUploadType = (type) => () => setUploadType(type);
 
   const onAddBook = async () => {
-    if (!urlBook) return;
+    if (uploadType === 'link') {
+      if (!urlBook || !openBook.title) return;
 
-    try {
-      let cv = '';
-      if (urlBook.includes('goodreads') || urlBook.includes('tiki')) {
-        const rs = await axios.get("api/review", {
-          params: {
-            url: urlBook
+      try {
+        let cv = '';
+        if (urlBook.includes('goodreads') || urlBook.includes('tiki')) {
+          const rs = await axios.get("api/review", {
+            params: {
+              url: urlBook
+            }
+          });
+          cv = rs.data.url;
+        } else {
+          cv = urlBook;
+        }
+        const addCoverToBook = books?.map(book => {
+          if (book.id === openBook.id) {
+            return { ...book, cover: cv, title: openBook.title };
           }
+          return book;
         });
-        cv = rs.data.url;
-      } else {
-        cv = urlBook;
+        setBooks(addCoverToBook);
+        setOpenBook(null);
+        setUrlBook('');
+
+      } catch (error) {
+        console.log("=====>>>>> onAddBook error: " + error);
       }
+    } else {
+      if (!tempCover || !openBook.title) return;
       const addCoverToBook = books?.map(book => {
         if (book.id === openBook.id) {
-          return { ...book, cover: cv };
+          return { ...book, cover: tempCover, title: openBook.title };
         }
         return book;
       });
       setBooks(addCoverToBook);
       setOpenBook(null);
-      setUrlBook('');
-
-    } catch (error) {
-      console.log("=====>>>>> onAddBook error: " + error);
+      setTempCover('');
     }
   };
 
@@ -103,6 +171,8 @@ export default function Page() {
     setUrlBook('');
   };
 
+  const onChangeTitle = (ev) => setOpenBook(prev => ({ ...prev, title: ev.target.value }));
+
 
   return (
     <section className="px-4 md:px-6  py-6">
@@ -110,28 +180,34 @@ export default function Page() {
         <Navbar />
         <div className='md:px-10'>
           <div className='my-4 md:px-4 flex flex-row items-center justify-between'>
-            <div className='text-[#7B7754] text-sm w-1/2'>Original template @mhanhtulamdoo</div>
+            <div className='text-[#7B7754] text-sm w-1/2'>
+              <div>Chỉnh sửa tác giả?</div>
+              <div className='flex flex-col sm:flex-row'>
+                <input value={author} onChange={(ev) => setAuthor(ev.target.value)}
+                  className='rounded-md border border-gray-300 p-2 sm:mr-2'
+                  placeholder='Nhập tên bạn' />
+                <Button name='Update' className='bg-green-500 text-white mt-2 sm:mt-0' />
+              </div>
+            </div>
             <div onClick={onExport} className='border flex flex-row items-center rounded-md p-3 bg-red-500  cursor-pointer'>
               <div className='font-bold text-white'>Export</div>
               <BiSolidCloudDownload className='ml-2 text-2xl text-white' />
             </div>
           </div>
-          <div id='capture' ref={elementRef} className='bg-[#FDF2E4] md:p-2'>
-            <div className='text-center font-serif font-bold text-3xl md:text-8xl sm:mt-3 text-[#7B7754]'>About you: Books</div>
-            <div>
-
-              <div className='text-right font-serif font-bold text-[10px] md:text-sm mb-1 sm:mb-3 text-[#7B7754] mr-12 sm:mr-20'>SachOi.com/review</div>
-            </div>
-            <div className='p-22 sm:mt-10 grid grid-cols-6 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-0'>
+          <div id='capture' className='bg-[#FDF2E4] md:p-2'>
+            <div className='mt-1 mr-2 sm:mt-1 sm:mr-1 text-right font-serif font-light text-[7px] md:text-base text-[#7B7754]'>SachOi.com/review</div>
+            <div className='text-center font-serif font-bold text-3xl md:text-4xl xl:text-6xl text-[#7B7754]'>About you: Books</div>
+            <div className='text-right font-serif font-bold text-[10px] sm:text-2xl mb-2 sm:mb-3 text-[#7B7754] mr-12 sm:mr-20'>{author}</div>
+            <div className='p-22 sm:mt-10 grid grid-cols-6 sm:grid-cols-6 md:grid-cols-6 lg:grid-cols-6 gap-0'>
               {books?.map(book => {
                 return (
                   <div key={book.id} className='flex flex-col items-center mb-2 sm:min-h-64 rounded-lg sm:p-1 cursor-pointer'>
-                    <div onClick={onOpenAddBook(book)} className='w-[50px] h-[70px] sm:w-32 sm:h-52 bg-gray-300 border-[1px] border-black overflow-hidden'>
+                    <div onClick={onOpenAddBook(book)} className='w-[50px] h-[70px] sm:w-20 sm:h-32 md:w-24 md:h-40 xl:w-44 xl:h-56 bg-gray-300 border-[1px] border-black overflow-hidden'>
                       {book?.cover && <img src={book?.cover}
-                        alt={book.title} className='w-[50px] h-[70px] sm:w-32 sm:h-52 object-cover' />}
+                        alt={book.title} className='w-[50px] h-[70px] sm:w-20 sm:h-32  md:w-24 md:h-40 xl:w-44 xl:h-56 object-cover' />}
                     </div>
                     <div className='flex flex-col items-center justify-center sm:mt-2'>
-                      <h3 className='text-[8px] sm:text-2xl text-center font-bold overflow-hidden line-clamp-3 mt-1 text-[#7B7754]'>{book.title}</h3>
+                      <h3 className='text-[8px] sm:text-xl md:text-xl xl:text-3xl text-center font-bold overflow-hidden line-clamp-3 mt-1 text-[#7B7754]'>{book.title}</h3>
                     </div>
                   </div>
                 );
@@ -141,24 +217,52 @@ export default function Page() {
         </div>
         <Modal
           open={openBook}
-          className='w-11/12 sm:w-1/2 sm:h-[300px] rounded-md'
+          className='w-11/12 sm:w-1/2 sm:m-h-[300px] rounded-md'
           onClose={() => setOpenBook(false)}
           onClickOutSide={() => setOpenBook(false)}>
           <div className='w-full'>
             <h2 className='font-bold text-xl'>Thêm Sách</h2>
-            <div className='mt-2'>Chọn ảnh từ link ( goodreads.com hoặc tiki.com ) hoặc tải lên từ thiết bị</div>
-            <div>
-              <div onClick={onSelectUploadType('link')} className='cursor-pointer'>
-                <input type="radio" value="link" name="uploadType" onChange={() => onSelectUploadType('link')} checked={uploadType === 'link'} />
-                <span className='ml-1'>Chọn ảnh từ link ( Chỉ từ goodreads.com hoặc tiki.com hoặc link ảnh )</span>
+            <div className='flex flex-row justify-between'>
+              <div>
+                <div className='mt-2'>Chọn nguồn ảnh:</div>
+                <div>
+                  <div onClick={onSelectUploadType('link')} className='cursor-pointer'>
+                    <input type="radio" value="link" name="uploadType" onChange={() => onSelectUploadType('link')} checked={uploadType === 'link'} />
+                    <span className='ml-1'>Chọn ảnh từ link (goodreads.com hoặc tiki.com hoặc link ảnh )</span>
+                  </div>
+                  <div onClick={onSelectUploadType('device')} className='cursor-pointer'>
+                    <input type="radio" value="device" name="uploadType" onChange={() => onSelectUploadType('device')} checked={uploadType === 'device'} />
+                    <span className='ml-1'>Tải lên từ thiết bị</span>
+                  </div>
+                </div>
+                {/* <p className='mt-2'>Bạn hãy lấy link từ goodreads.com hoặc tiki.com rồi paste vào ô dưới:</p> */}
               </div>
-              <div onClick={onSelectUploadType('device')} className='cursor-pointer'>
-                <input type="radio" value="device" name="uploadType" onChange={() => onSelectUploadType('device')} checked={uploadType === 'device'} />
-                <span className='ml-1'>Tải lên từ thiết bị ( comming soon )</span>
-              </div>
+              {tempCover && <img src={tempCover}
+                alt={'Book cover'} className='w-[80px] h-[140px] sm:w-20 sm:h-28 object-cover sm:mr-4 ' />}
             </div>
-            <p className='mt-2'>Bạn hãy lấy link từ goodreads.com hoặc tiki.com rồi paste vào ô dưới:</p>
-            <textarea value={urlBook} onChange={onChangeUrlPath} className='border border-grey w-full p-2' />
+
+            <div>
+              {uploadType === 'link' ?
+                (
+                  <div>
+                    <p className='mt-2'>Bạn hãy lấy link từ goodreads.com hoặc tiki.com rồi paste vào ô dưới:</p>
+                    <textarea value={urlBook} onChange={onChangeUrlPath} className='border border-grey w-full p-2' />
+                  </div>
+                )
+                : (
+                  <div className='mt-2'>
+                    <div {...getRootProps({ style })}>
+                      <input {...getInputProps()} />
+                      <p>Kéo rồi thả ảnh vào đây, hoặc ấn vào lựa chọn</p>
+                    </div>
+                  </div>
+                )}
+            </div>
+
+            <div>
+              <input value={openBook?.title} onChange={onChangeTitle} className='border border-grey w-full p-2 mt-2' placeholder='Nhập content' />
+            </div>
+
             <div className='flex justify-end mt-2'>
               <Button name='Huỷ bỏ' onClick={() => setOpenBook(false)} className='mr-4 bg-gray-400' />
               <Button name='Thêm' onClick={onAddBook} />
