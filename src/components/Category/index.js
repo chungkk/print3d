@@ -37,12 +37,12 @@ export default function Category() {
   const handleSearch = (name) => () => {
     const params = new URLSearchParams(searchParams);
     // params.set('page', '1');
-    if (!cat) {
-      params.set('category', name);
-      setCat(name);
-    } else {
+    if (cat === name) {
       params.delete('category');
       setCat('');
+    } else {
+      params.set('category', name);
+      setCat(name);
     }
     replace(`${pathname}?${params.toString()}`);
   };
