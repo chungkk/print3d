@@ -7,6 +7,7 @@ import { BiSolidCloudDownload } from "react-icons/bi";
 import Modal from '@/components/Modal';
 import Button from '@/components/Button';
 import { useDropzone } from 'react-dropzone';
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 const bookInit = [
   { id: 1, title: 'Quyền sách yêu thích nhất', },
@@ -218,11 +219,15 @@ export default function Page() {
               {books?.map(book => {
                 return (
                   <div key={book.id} className='flex flex-col items-center mb-2 sm:min-h-64 rounded-lg sm:p-1 cursor-pointer'>
-                    <div onClick={onOpenAddBook(book)} className='w-[50px] h-[70px] sm:w-20 sm:h-32 md:w-24 md:h-40 xl:w-44 xl:h-56 bg-gray-300 border-[1px] border-black overflow-hidden'>
-                      {book?.cover && <img src={book?.cover}
-                        alt={book.title} className='w-[50px] h-[70px] sm:w-20 sm:h-32  md:w-24 md:h-40 xl:w-44 xl:h-56 object-cover' />}
+                    <div onClick={!book?.cover ? onOpenAddBook(book) : () => { }} className='w-[50px] h-[70px] sm:w-20 sm:h-32 md:w-24 md:h-40 xl:w-44 xl:h-56 bg-gray-300 border-[1px] border-black overflow-hidden'>
+                      <TransformWrapper>
+                        <TransformComponent>
+                          {book?.cover && <img src={book?.cover}
+                            alt={book.title} className='w-[50px] h-[70px] sm:w-20 sm:h-32  md:w-24 md:h-40 xl:w-44 xl:h-56 object-cover' />}
+                        </TransformComponent>
+                      </TransformWrapper>
                     </div>
-                    <div className='flex flex-col items-center justify-center sm:mt-2'>
+                    <div onClick={onOpenAddBook(book)} className='flex flex-col items-center justify-center sm:mt-2'>
                       <h3 className='text-[8px] sm:text-xl md:text-xl xl:text-3xl text-center font-bold overflow-hidden line-clamp-3 mt-1 text-[#7B7754]'>{book.title}</h3>
                     </div>
                   </div>
