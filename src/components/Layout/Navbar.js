@@ -18,7 +18,7 @@ export default function Navbar() {
         <Link href='/' className='text-white mr-7'>Books</Link>
         <Link href='/review' className='text-white mr-7'>Review</Link>
         <Link href='/' className='text-white mr-7'>Events</Link>
-        <Link href='/' className='text-white mr-7'>About</Link>
+        <Link href='/about' className='text-white mr-7'>About</Link>
         <Link href='/' className='text-white mr-7'>More</Link>
       </div>
       <FaBars
@@ -36,15 +36,15 @@ export default function Navbar() {
             <div className="font-bold text-2xl mb-8">DANH MỤC</div>
             <GrClose className="h-6 w-6 mr-2" onClick={onToggleMenu} />
           </div>
-          <Link href='/' className='mr-7 text-blue-500'>Books</Link>
+          <Link href='/' className='mr-7 mt-4 text-blue-500'>Books</Link>
           <hr />
-          <Link href='/review' className='mr-7 text-blue-500 mt-2'>Review</Link>
+          <Link href='/review' className='mr-7 mt-4 text-blue-500 mt-2'>Review</Link>
           <hr />
-          <Link href='/' className='mr-7 text-blue-500 mt-2'>Events</Link>
+          <Link href='/' className='mr-7 mt-4 text-blue-500 mt-2'>Events</Link>
           <hr />
-          <Link href='/' className='mr-7 text-blue-500 mt-2'>About</Link>
+          <Link href='/' className='mr-7 mt-4 text-blue-500 mt-2'>About</Link>
           <hr />
-          <Link href='/' className='mr-7 text-blue-500 mt-2'>More</Link>
+          <Link href='/' className='mr-7 mt-4 text-blue-500 mt-2'>More</Link>
           <hr />
         </div>
       </Modal>
