@@ -172,7 +172,6 @@ export default function Page() {
       });
       setBooks(addCoverToBook);
       localStorage.setItem('sachOiBooks', JSON.stringify(addCoverToBook));
-      setValue(addCoverToBook);
       setOpenBook(null);
       setTempCover('');
     }
