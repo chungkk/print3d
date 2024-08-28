@@ -1,13 +1,13 @@
 "use client";
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import axios from 'axios';
-import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 import Navbar from "@/components/Layout/Navbar";
 import { BiSolidCloudDownload } from "react-icons/bi";
 import Modal from '@/components/Modal';
 import Button from '@/components/Button';
 import { useDropzone } from 'react-dropzone';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import { domToPng } from 'modern-screenshot';
 
 const bookInit = [
   { id: 1, title: 'Quyền sách yêu thích nhất', },
@@ -116,15 +116,12 @@ export default function Page() {
 
   const onExport = () => {
     const capture = document.getElementById('capture');
-    toPng(capture, { cacheBust: true }).then(function (dataUrl) {
-      var link = document.createElement('a');
+    domToPng(capture).then(dataUrl => {
+      const link = document.createElement('a');
       link.download = `sachoi.com-${author?.replace(/[^a-zA-Z0-9]/g, '')}.png`;
       link.href = dataUrl;
       link.click();
-    })
-      .catch(function (error) {
-        console.error('oops, something went wrong!', error);
-      });
+    });
   };
 
   const onChangeUrlPath = (e) => {
@@ -161,6 +158,7 @@ export default function Page() {
         setUrlBook('');
       } catch (error) {
         console.log("=====>>>>> onAddBook error: " + error);
+        alert(JSON.stringify(error));
       }
     } else {
       if (!tempCover || !openBook.title) return;
