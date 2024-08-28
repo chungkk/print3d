@@ -8,6 +8,7 @@ import Button from '@/components/Button';
 import { useDropzone } from 'react-dropzone';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { domToPng } from 'modern-screenshot';
+import { useClientMediaQuery } from '@/hooks/useClientMediaQuery';
 
 const bookInit = [
   { id: 1, title: 'Quyền sách yêu thích nhất', },
@@ -72,6 +73,8 @@ export default function Page() {
   const [uploadType, setUploadType] = useState('link');
   const [tempCover, setTempCover] = useState();
   const [author, setAuthor] = useState('@SachOi');
+
+  const isMobile = useClientMediaQuery('(max-width: 600px)');
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -153,7 +156,7 @@ export default function Page() {
           return book;
         });
         setBooks(addCoverToBook);
-        localStorage.setItem('sachOiBooks', JSON.stringify(addCoverToBook));
+        !isMobile && localStorage.setItem('sachOiBooks', JSON.stringify(addCoverToBook));
         setOpenBook(null);
         setUrlBook('');
       } catch (error) {
@@ -169,7 +172,7 @@ export default function Page() {
         return book;
       });
       setBooks(addCoverToBook);
-      localStorage.setItem('sachOiBooks', JSON.stringify(addCoverToBook));
+      !isMobile && localStorage.setItem('sachOiBooks', JSON.stringify(addCoverToBook));
       setOpenBook(null);
       setTempCover('');
     }
