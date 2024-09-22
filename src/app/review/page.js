@@ -200,7 +200,7 @@ export default function Page() {
               <BiSolidCloudDownload className='ml-2 text-2xl text-white' />
             </div>
           </div>
-          <div className='text-green-500'>Tip: bạn có thể phóng to, thu nhỏ hoặc kéo ảnh cho vừa với khung bên ngoài</div>
+          {!isMobile && <div className='text-green-500'>Tip: bạn có thể phóng to, thu nhỏ hoặc kéo ảnh cho vừa với khung bên ngoài</div>}
           <div id='capture' className='bg-[#FDF2E4] md:p-2'>
             <div className='mt-1 mr-2 sm:mt-1 sm:mr-1 text-right font-serif font-light text-[7px] md:text-base text-[#7B7754]'>Created by: SachOi.com/review</div>
             <div className='text-center font-serif font-bold text-3xl md:text-4xl xl:text-6xl text-[#7B7754]'>{config?.title}</div>
