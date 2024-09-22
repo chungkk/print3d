@@ -53,7 +53,7 @@ export default function Page() {
   const [uploadType, setUploadType] = useState('link');
   const [tempCover, setTempCover] = useState();
   const [isModalConfig, setIsModalConfig] = useState(false);
-  const [config, setConfig] = useState({ title: 'About you: Books', author: '@SachOi', hiddenBookTitle: false });
+  const [config, setConfig] = useState({ title: 'About you: Books', author: '@Your Name', hiddenBookTitle: false });
   const [isEdit, setIsEdit] = useState(false);
   const [isExport, setIsExport] = useState(false);
 
@@ -200,9 +200,9 @@ export default function Page() {
               <BiSolidCloudDownload className='ml-2 text-2xl text-white' />
             </div>
           </div>
-          <div className='text-green-500'>Tip: bạn có thể phóng to hoặc thu nhỏ ảnh cho khít với khung bên ngoài</div>
+          <div className='text-green-500'>Tip: bạn có thể phóng to, thu nhỏ hoặc kéo ảnh cho vừa với khung bên ngoài</div>
           <div id='capture' className='bg-[#FDF2E4] md:p-2'>
-            <div className='mt-1 mr-2 sm:mt-1 sm:mr-1 text-right font-serif font-light text-[7px] md:text-base text-[#7B7754]'>SachOi.com/review</div>
+            <div className='mt-1 mr-2 sm:mt-1 sm:mr-1 text-right font-serif font-light text-[7px] md:text-base text-[#7B7754]'>Created by: SachOi.com/review</div>
             <div className='text-center font-serif font-bold text-3xl md:text-4xl xl:text-6xl text-[#7B7754]'>{config?.title}</div>
             <div className='text-right font-serif font-bold text-[10px] sm:text-2xl mb-2 sm:mb-3 text-[#7B7754] mr-12 sm:mr-20'>{config?.author}</div>
             <div className='p-22 sm:mt-10 grid grid-cols-6 sm:grid-cols-6 md:grid-cols-6 lg:grid-cols-6 gap-0'>
