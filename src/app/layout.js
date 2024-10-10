@@ -3,8 +3,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Sách ơi! mở ra...",
-  description: "Sách ơi! mở ra...",
+  title: "3D Printer",
+  description: "3D Printer",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
