@@ -4,7 +4,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "3D Printer",
-  description: "3D Printer",
+  description: "Sách ơi! mở ra...",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
